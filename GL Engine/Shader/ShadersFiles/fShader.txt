@@ -1,0 +1,13 @@
+#version 330 core
+
+out vec4 o_fragColor;
+
+in vec3 i_Color;
+in vec2 texCoords;
+
+uniform sampler2D i_texture;
+
+void main()
+{
+    o_fragColor = texture(i_texture, texCoords);
+}
