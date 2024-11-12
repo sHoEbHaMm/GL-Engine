@@ -109,3 +109,13 @@ glm::vec3 cubePositions[] = {
     glm::vec3(1.5f,  0.2f, -1.5f),
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
+
+/* Element Buffer Object */
+//unsigned int EBO;
+//glGenBuffers(1, &EBO);
+//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    //glEnableVertexAttribArray(2);
+    //glDeleteBuffers(1, &EBO);
