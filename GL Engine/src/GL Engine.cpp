@@ -68,7 +68,7 @@ int main()
     glBindVertexArray(0);
 
     /* Texture */
-    Texture texture("Resources/Textures/Wood.jpg");
+    Texture texture("Resources/Textures/rubiks.jpg");
 
     /* Render Loop */
     while (!glfwWindowShouldClose(window))
