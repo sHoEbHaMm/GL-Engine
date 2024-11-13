@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera() :
-	cameraPos(0.0f, 0.0f, 3.0f), cameraUp(0.0f, 1.0f, 0.0f), cameraFront(0.0f, 0.0f, -1.0f),
+	cameraPos(0.0f, 0.0f, 6.0f), cameraUp(0.0f, 1.0f, 0.0f), cameraFront(0.0f, 0.0f, -1.0f),
     lastX(800/2.0f), lastY(600/2.0f), isFirstMouse(true), yaw(-90.0f), pitch(0.0f),
     MouseSensitivity(0.1f), Zoom(45.0f), MovementSpeed(2.5f)
 {

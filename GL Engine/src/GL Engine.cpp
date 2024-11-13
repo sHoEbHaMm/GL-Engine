@@ -56,13 +56,16 @@ int main()
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(newVertices), newVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesWNormal), verticesWNormal, GL_STATIC_DRAW);
 
     glBindVertexArray(VAO);
 
     /* Vertex Attribute Pointer */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
@@ -70,7 +73,7 @@ int main()
     glGenVertexArrays(1, &lightCubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindVertexArray(lightCubeVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
@@ -80,10 +83,7 @@ int main()
     shader.useProgram();
 
     unsigned int oColor = glGetUniformLocation(shader.GetID(), "objectColor");
-    unsigned int lColor = glGetUniformLocation(shader.GetID(), "lightColor");
-
     glUniform3f(oColor, 1.0f, 0.5f, 0.31f);
-    glUniform3f(lColor, 1.0f, 1.0f, 1.0f);
 
     /* Render Loop */
     while (!glfwWindowShouldClose(window))
@@ -103,9 +103,21 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         texture.Bind();
+
+        /* GAME OBJECT CODE - BIG CUBE */
         shader.useProgram();
 
-        /* Transformations */
+        /* Change light color every frame */
+        glm::vec3 lightColor(sin(glfwGetTime()), 1.0f, cos(glfwGetTime()));
+        unsigned int lColor = glGetUniformLocation(shader.GetID(), "lightColor");
+        glUniform3f(lColor, lightColor.x, lightColor.y, lightColor.z);
+
+        /* Change light source position every frame */
+        glm::vec3 LightPos(2 * sin(glfwGetTime()), 0.0f, 1.5 * cos(glfwGetTime()));
+        unsigned int lightPos = glGetUniformLocation(shader.GetID(), "lightPos");
+        glUniform3f(lightPos, LightPos.x, LightPos.y, LightPos.z);
+
+        /* Transformations for object */
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(camera.GetZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         unsigned int projLoc = glGetUniformLocation(shader.GetID(), "projection");
@@ -117,15 +129,22 @@ int main()
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, (float)glm::radians(glfwGetTime() * 25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         unsigned int modelLoc = glGetUniformLocation(shader.GetID(), "model");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        unsigned int viewPos = glGetUniformLocation(shader.GetID(), "viewPos");
+        glUniform3f(viewPos, camera.GetCameraPos().x, camera.GetCameraPos().y, camera.GetCameraPos().z);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
+        /* LIGHT SOURCE CODE - SMALL CUBE */
         lightSourceShader.useProgram();
+
+        /* Change light source visual every frame */
+        unsigned int sourceColor = glGetUniformLocation(lightSourceShader.GetID(), "sourceColor");
+        glUniform3f(sourceColor, lightColor.x, lightColor.y, lightColor.z);
+
         unsigned int lProj = glGetUniformLocation(lightSourceShader.GetID(), "projection");
         unsigned int lView = glGetUniformLocation(lightSourceShader.GetID(), "view");
         unsigned int lModel = glGetUniformLocation(lightSourceShader.GetID(), "model");
@@ -133,7 +152,8 @@ int main()
         glUniformMatrix4fv(lView, 1, GL_FALSE, glm::value_ptr(view));
 
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
+        model = glm::translate(model, LightPos);
+        model = glm::rotate(model, (float)glm::radians(glfwGetTime() * 25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.1f));
         glUniformMatrix4fv(lModel, 1, GL_FALSE, glm::value_ptr(model));
 

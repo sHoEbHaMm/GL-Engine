@@ -1,11 +1,10 @@
 #version 330 core
 
 layout (location = 0) in vec3 i_pos;
+layout (location = 1) in vec3 i_Normal;
 
-out vec4 fragColor;
-
-uniform vec3 objectColor;
-uniform vec3 lightColor;
+out vec3 Normal;
+out vec3 fragPos;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -13,10 +12,9 @@ uniform mat4 view;
 
 void main()
 {
-	float ambientStrength = 0.1f;
-	vec3 ambient = ambientStrength * lightColor;
-	vec3 result = ambient * objectColor;
+	gl_Position = projection * view * model * vec4(i_pos, 1.0); // Position of cube in world space
 
-	gl_Position = projection * view * model * vec4(i_pos, 1.0);
-	fragColor = vec4(result, 1.0);
+	fragPos = vec3(model * vec4(i_pos, 1.0)); // Position of a particular fragment in world space
+
+	Normal = mat3(transpose(inverse(model))) * i_Normal;
 }

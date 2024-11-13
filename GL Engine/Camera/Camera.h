@@ -28,4 +28,5 @@ private:
 public:
 	inline glm::mat4 GetCameraView() const { return cameraView; }
 	inline float GetZoom() const { return Zoom;  }
+	inline glm::vec3 GetCameraPos() const { return cameraPos; }
 };
