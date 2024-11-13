@@ -134,7 +134,7 @@ int main()
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
-        model = glm::scale(model, glm::vec3(0.2f));
+        model = glm::scale(model, glm::vec3(0.1f));
         glUniformMatrix4fv(lModel, 1, GL_FALSE, glm::value_ptr(model));
 
         glBindVertexArray(lightCubeVAO);
