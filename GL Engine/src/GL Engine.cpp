@@ -45,30 +45,45 @@ int main()
     }
 
     /* Shaders */
-    Shader shader("Shader/ShadersFiles/vShader.txt", "Shader/ShadersFiles/fShader.txt");
+    Shader shader("Shader/ShadersFiles/V_ObjectShader.txt", "Shader/ShadersFiles/F_ObjectShader.txt");
+    Shader lightSourceShader("Shader/ShadersFiles/V_LightSource.txt", "Shader/ShadersFiles/F_LightSource.txt");
 
     /* Vertex Array Object */
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
 
     /* Vertex Buffer Object */
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(newVertices), newVertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(VAO);
 
     /* Vertex Attribute Pointer */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
 
+    unsigned int lightCubeVAO;
+    glGenVertexArrays(1, &lightCubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindVertexArray(lightCubeVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
     /* Texture */
     Texture texture("Resources/Textures/rubiks.jpg");
+
+    shader.useProgram();
+
+    unsigned int oColor = glGetUniformLocation(shader.GetID(), "objectColor");
+    unsigned int lColor = glGetUniformLocation(shader.GetID(), "lightColor");
+
+    glUniform3f(oColor, 1.0f, 0.5f, 0.31f);
+    glUniform3f(lColor, 1.0f, 1.0f, 1.0f);
 
     /* Render Loop */
     while (!glfwWindowShouldClose(window))
@@ -82,14 +97,13 @@ int main()
         camera.processKeyboardInput(window, deltaTime);
 
         /* Render here */
-        glClearColor(sin(glfwGetTime()), cos(glfwGetTime()), tan(glfwGetTime()), 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         texture.Bind();
         shader.useProgram();
-        glBindVertexArray(VAO);
 
         /* Transformations */
         glm::mat4 projection = glm::mat4(1.0f);
@@ -101,23 +115,31 @@ int main()
         unsigned int viewLoc = glGetUniformLocation(shader.GetID(), "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-        for (unsigned int i = 0; i < 10; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle;
-            if (i == 0) { 
-                angle = 20.0f * glfwGetTime();
-            }
-            else {
-                angle = 20.0f * glfwGetTime() * i;
-            }
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            unsigned int modelLoc = glGetUniformLocation(shader.GetID(), "model");
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, (float)glm::radians(glfwGetTime() * 25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        unsigned int modelLoc = glGetUniformLocation(shader.GetID(), "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        lightSourceShader.useProgram();
+        unsigned int lProj = glGetUniformLocation(lightSourceShader.GetID(), "projection");
+        unsigned int lView = glGetUniformLocation(lightSourceShader.GetID(), "view");
+        unsigned int lModel = glGetUniformLocation(lightSourceShader.GetID(), "model");
+        glUniformMatrix4fv(lProj, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(lView, 1, GL_FALSE, glm::value_ptr(view));
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(1.2f, 1.0f, 2.0f));
+        model = glm::scale(model, glm::vec3(0.2f));
+        glUniformMatrix4fv(lModel, 1, GL_FALSE, glm::value_ptr(model));
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
         /* glfw: swap buffers and poll IO events(keys pressed / released, mouse moved etc.) */
         glfwSwapBuffers(window);

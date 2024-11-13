@@ -167,7 +167,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shader\ShadersFiles\fShader.txt" />
+    <Text Include="Shader\ShadersFiles\F_LightSource.txt" />
+    <Text Include="Shader\ShadersFiles\F_ObjectShader.txt" />
     <Text Include="Shader\ShadersFiles\vShader.txt" />
+    <Text Include="Shader\ShadersFiles\V_LightSource.txt" />
+    <Text Include="Shader\ShadersFiles\V_ObjectShader.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
