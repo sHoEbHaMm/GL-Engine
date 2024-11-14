@@ -108,7 +108,8 @@ int main()
         shader.useProgram();
 
         /* Change light color every frame */
-        glm::vec3 lightColor(sin(glfwGetTime()), 1.0f, cos(glfwGetTime()));
+        glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+        //glm::vec3 lightColor(sin(glfwGetTime()), 1.0f, cos(glfwGetTime()));
         unsigned int lColor = glGetUniformLocation(shader.GetID(), "lightColor");
         glUniform3f(lColor, lightColor.x, lightColor.y, lightColor.z);
 
@@ -134,6 +135,18 @@ int main()
 
         unsigned int viewPos = glGetUniformLocation(shader.GetID(), "viewPos");
         glUniform3f(viewPos, camera.GetCameraPos().x, camera.GetCameraPos().y, camera.GetCameraPos().z);
+
+        /* Material setting */
+        unsigned int matAmbient = glGetUniformLocation(shader.GetID(), "material.ambient");
+        unsigned int matDiffuse = glGetUniformLocation(shader.GetID(), "material.diffuse");
+        unsigned int matSpecular = glGetUniformLocation(shader.GetID(), "material.specular");
+        unsigned int matShininess = glGetUniformLocation(shader.GetID(), "material.shininess");
+
+        glUniform3f(matAmbient, 1.0f, 0.5f, 0.31f);
+        glUniform3f(matDiffuse, 1.0f, 0.5f, 0.31f);
+        glUniform3f(matSpecular, 0.5f, 0.5f, 0.5f);
+        glUniform1f(matShininess, 32.0f);
+
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
