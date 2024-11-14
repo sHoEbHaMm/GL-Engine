@@ -10,6 +10,6 @@
 
 
 *PHONG Lighting Demo*
-[![Watch the video](https://img.youtube.com/vi/U_hctp_xHdw/maxresdefault.jpg)](https://youtu.be/U_hctp_xHdw)
+[![Watch the video](https://img.youtube.com/vi/fRwyIASCFUw/maxresdefault.jpg)](https://youtu.be/fRwyIASCFUw)
 
 
