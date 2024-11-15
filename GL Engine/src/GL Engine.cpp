@@ -147,6 +147,14 @@ int main()
         glUniform3f(matSpecular, 0.5f, 0.5f, 0.5f);
         glUniform1f(matShininess, 32.0f);
 
+        unsigned int lightAmbient = glGetUniformLocation(shader.GetID(), "light.ambient");
+        unsigned int lightDiffuse = glGetUniformLocation(shader.GetID(), "light.diffuse");
+        unsigned int lightSpecular = glGetUniformLocation(shader.GetID(), "light.specular");
+
+        glUniform3f(lightAmbient, 0.2f, 0.2f, 0.2f);
+        glUniform3f(lightDiffuse, 0.5f, 0.5f, 0.5f);
+        glUniform3f(lightSpecular, 1.0f, 1.0f, 1.0f);
+
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
