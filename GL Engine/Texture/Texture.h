@@ -13,6 +13,9 @@ private:
 	int m_Width, m_Height, m_NRChannels;
 
 public:
+	static unsigned int loadTexture(char const* path);
+
+public:
 	Texture(const char* path);
 	inline void Bind() { glBindTexture(GL_TEXTURE_2D, this->m_TextureID); }
 	inline unsigned int GetID() { return m_TextureID; }

@@ -2,9 +2,11 @@
 
 layout (location = 0) in vec3 i_pos;
 layout (location = 1) in vec3 i_Normal;
+layout (location = 2) in vec2 i_texCoords;
 
 out vec3 Normal;
 out vec3 fragPos;
+out vec2 texCoords;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -17,4 +19,6 @@ void main()
 	fragPos = vec3(model * vec4(i_pos, 1.0)); // Position of a particular fragment in world space
 
 	Normal = mat3(transpose(inverse(model))) * i_Normal;
+
+	texCoords = i_texCoords;
 }

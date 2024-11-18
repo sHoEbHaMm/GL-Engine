@@ -1,5 +1,6 @@
 /* Vendor includes */
 #include "config.h"
+#include <stb_image.h>
 
 /* My includes */
 #include "GLFWindow.h"
@@ -10,6 +11,7 @@
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+unsigned int loadTexture(char const* path);
 
 /* Camera */
 Camera camera;
@@ -56,16 +58,19 @@ int main()
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesWNormal), verticesWNormal, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesWnormalWtextures), verticesWnormalWtextures, GL_STATIC_DRAW);
 
     glBindVertexArray(VAO);
 
     /* Vertex Attribute Pointer */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 
@@ -73,17 +78,21 @@ int main()
     glGenVertexArrays(1, &lightCubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindVertexArray(lightCubeVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
     /* Texture */
-    Texture texture("Resources/Textures/rubiks.jpg");
+    unsigned int diffuseMap = Texture::loadTexture("resources/textures/container2.png");
+    unsigned int specularMap = Texture::loadTexture("resources/textures/container2_specular.png");
 
     shader.useProgram();
 
-    unsigned int oColor = glGetUniformLocation(shader.GetID(), "objectColor");
-    glUniform3f(oColor, 1.0f, 0.5f, 0.31f);
+    unsigned int diffuse = glGetUniformLocation(shader.GetID(), "material.diffuse");
+    glUniform1i(diffuse, 0);
+
+    unsigned int specular = glGetUniformLocation(shader.GetID(), "material.specular");
+    glUniform1i(specular, 1);
 
     /* Render Loop */
     while (!glfwWindowShouldClose(window))
@@ -102,16 +111,11 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        texture.Bind();
-
         /* GAME OBJECT CODE - BIG CUBE */
         shader.useProgram();
 
         /* Change light color every frame */
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-        //glm::vec3 lightColor(sin(glfwGetTime()), 1.0f, cos(glfwGetTime()));
-        unsigned int lColor = glGetUniformLocation(shader.GetID(), "lightColor");
-        glUniform3f(lColor, lightColor.x, lightColor.y, lightColor.z);
 
         /* Change light source position every frame */
         glm::vec3 LightPos(2 * sin(glfwGetTime()), 0.0f, 1.5 * cos(glfwGetTime()));
@@ -137,15 +141,8 @@ int main()
         glUniform3f(viewPos, camera.GetCameraPos().x, camera.GetCameraPos().y, camera.GetCameraPos().z);
 
         /* Material setting */
-        unsigned int matAmbient = glGetUniformLocation(shader.GetID(), "material.ambient");
-        unsigned int matDiffuse = glGetUniformLocation(shader.GetID(), "material.diffuse");
-        unsigned int matSpecular = glGetUniformLocation(shader.GetID(), "material.specular");
         unsigned int matShininess = glGetUniformLocation(shader.GetID(), "material.shininess");
-
-        glUniform3f(matAmbient, 1.0f, 0.5f, 0.31f);
-        glUniform3f(matDiffuse, 1.0f, 0.5f, 0.31f);
-        glUniform3f(matSpecular, 0.5f, 0.5f, 0.5f);
-        glUniform1f(matShininess, 32.0f);
+        glUniform1f(matShininess, 64.0f);
 
         unsigned int lightAmbient = glGetUniformLocation(shader.GetID(), "light.ambient");
         unsigned int lightDiffuse = glGetUniformLocation(shader.GetID(), "light.diffuse");
@@ -155,6 +152,11 @@ int main()
         glUniform3f(lightDiffuse, 0.5f, 0.5f, 0.5f);
         glUniform3f(lightSpecular, 1.0f, 1.0f, 1.0f);
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -180,7 +182,6 @@ int main()
 
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         /* glfw: swap buffers and poll IO events(keys pressed / released, mouse moved etc.) */
         glfwSwapBuffers(window);
