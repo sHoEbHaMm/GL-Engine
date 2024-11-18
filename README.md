@@ -13,3 +13,5 @@
 [![Watch the video](https://img.youtube.com/vi/fRwyIASCFUw/maxresdefault.jpg)](https://youtu.be/fRwyIASCFUw)
 
 
+*Lighting Maps - Diffuse & Specular Demo*
+[![Watch the video](https://img.youtube.com/vi/5fB50tT1uSI/maxresdefault.jpg)](https://youtu.be/5fB50tT1uSI)
